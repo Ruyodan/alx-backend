@@ -1,36 +1,44 @@
 #!/usr/bin/env python3
-"""Module containing Flask app with Babel integration"""
-from flask import Flask, render_template, request
+"""
+Flask app
+"""
+from flask import (
+    Flask,
+    render_template,
+    request
+)
 from flask_babel import Babel
-
-app = Flask(__name__)
-babel = Babel(app)
 
 
 class Config(object):
-    """Class that defines Babel instance attributes"""
+    """
+    Configuration for Babel
+    """
+    LANGUAGES = ["en", "fr"]
+    BABEL_DEFAULT_LOCALE = "en"
+    BABEL_DEFAULT_TIMEZONE = "UTC"
 
-    LANGUAGES = ['en', 'fr']
-    BABEL_DEFAULT_LOCALE = 'en'
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
-
+app = Flask(__name__)
 app.config.from_object(Config)
-
-
-@app.route('/')
-def root():
-    """Function defining route to html template"""
-
-    return render_template('2-index.html')
+babel = Babel(app)
 
 
 @babel.localeselector
 def get_locale():
-    """Function to determine the best match with our supported languages"""
-
+    """
+    Select and return best language match based on supported languages
+    """
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
+@app.route('/', strict_slashes=False)
+def index() -> str:
+    """
+    Handles / route
+    """
+    return render_template('2-index.html')
+
+
 if __name__ == "__main__":
-    app.run()
+    app.run(port="5000", host="0.0.0.0", debug=True)
